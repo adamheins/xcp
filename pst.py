@@ -72,6 +72,8 @@ def cp(item):
     name = os.path.basename(item)
     # TODO not sure if I need to use absolute path
     dest = os.path.join(PST_CURR_DIR, name)
+    print(src)
+    print(dest)
 
     make_dirs()
     backup()
@@ -123,6 +125,7 @@ def pst(dest=None):
 
 def main():
     args = sys.argv[1:]
+    print(args)
     if args[0] == 'cp':
         cp(args[1])
     elif args[0] == 'mv':
