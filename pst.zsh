@@ -10,7 +10,7 @@ if [ -h $0 ]; then
   PST_SRC_DIR=$(dirname $(readlink $0))
 fi
 
-PST_PY=PST_SRC_DIR/pst.py
+PST_PY=$PST_SRC_DIR/pst.py
 
 
 # Behaves the same as normal `cp', unless exactly one non-flag argument is
@@ -51,28 +51,5 @@ mv() {
 
 # Paste the last files or directories that were cut or copied.
 pst() {
-  [ ! -d $PST_DIR ] && return
-
-  # With no argument, paste whatever is stored in the "clipboard" to the cwd.
-  if [ -z $1 ]; then
-    $PST_PY pst
-  else
-    case "$1" in
-      "-l"|"--list") command ls -A $PST_CURR_DIR ;;
-      "-h"|"--help")
-        echo "usage: pst [-chl] [dest]"
-        echo ""
-        echo "arguments:"
-        echo "  -c, --clean  Remove all files from \$PST_DIR."
-        echo "  -h, --help   Print this help message."
-        echo "  -l, --list   List files in the \$PST_DIR."
-      ;;
-      "-c"|"--clean")
-        setopt localoptions rmstarsilent
-        rm -rf $PST_CURR_DIR/*(N)
-        rm -rf $PST_OLD_DIR/*(N)
-      ;;
-      *) $PST_PY pst "$1" ;;
-    esac
-  fi
+  $PST_PY $@
 }

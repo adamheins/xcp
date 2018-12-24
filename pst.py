@@ -6,12 +6,26 @@ import shutil
 import sys
 
 
+HELP_TEXT = '''
+usage: pst [-chl] [dest]
+
+arguments:
+-c, --clean  Remove all files from the clipboard, including backups.
+-h, --help   Print this help message.
+-l, --list   List files in the clipboard.
+'''.strip()
+
 PST_DIR = os.path.expanduser('~/.pst')
 PST_CURR_DIR = os.path.join(PST_DIR, 'current')
 PST_OLD_DIR = os.path.join(PST_DIR, 'old')
 
 # Number of old items to keep in the backup directory.
 NUM_OLD_ITEMS = 5
+
+
+def yellow(s):
+    ''' Color a string yellow. '''
+    return colorama.Fore.YELLOW + s + colorama.Fore.RESET
 
 
 def make_dirs():
@@ -55,25 +69,45 @@ def uniq_name(name, d):
     return new_name
 
 
+def user_confirm(prompt):
+    ''' Prompt user for confirmation. '''
+    ans = input(prompt)
+    if len(ans) > 0:
+        return ans[0] == 'y' or ans[0] == 'Y'
+    return False
+
+
 def backup():
+    ''' Back up files sitting in the paste buffer. '''
     # Move all files from current directory to the backup.
     for item in os.listdir(PST_CURR_DIR):
         new_name = uniq_name(item, PST_OLD_DIR)
-        shutil.move(new_name, PST_OLD_DIR)
+        shutil.move(os.path.join(PST_CURR_DIR, item),
+                    os.path.join(PST_OLD_DIR, new_name))
 
     # Remove all but the N most recent files in the backup directory.
-    old_items = list_dir_by_age(PST_OLD_DIR)
-    for item in old_items[NUM_OLD_ITEMS:]:
-        remove_item(item)
+    old_paths = list_dir_by_age(PST_OLD_DIR)
+    for path in old_paths[NUM_OLD_ITEMS:]:
+        remove_item(path)
+
+
+def list_items():
+    ''' List current item(s) in the clipboard. '''
+    for item in os.listdir(PST_CURR_DIR):
+        print(item)
+
+
+def clean():
+    ''' Remove all items, both current and backed up. '''
+    shutil.rmtree(PST_CURR_DIR)
+    shutil.rmtree(PST_OLD_DIR)
+    make_dirs()
 
 
 def cp(item):
     src = item
     name = os.path.basename(item)
-    # TODO not sure if I need to use absolute path
     dest = os.path.join(PST_CURR_DIR, name)
-    print(src)
-    print(dest)
 
     make_dirs()
     backup()
@@ -84,20 +118,12 @@ def cp(item):
 def mv(item):
     src = item
     name = os.path.basename(item)
-    # TODO not sure if I need to use absolute path
     dest = os.path.join(PST_CURR_DIR, name)
 
     make_dirs()
     backup()
 
     shutil.move(src, dest)
-
-
-def user_confirm(prompt):
-    ans = raw_input(prompt)
-    if len(ans) > 0:
-        return ans[0] == 'y' or ans[0] == 'Y'
-    return False
 
 
 def pst(dest=None):
@@ -111,33 +137,45 @@ def pst(dest=None):
         return
 
     path = paths[0]
-    item = os.path.basebame(path)
+    item = os.path.basename(path)
     dest = dest if dest else item
 
+    # If the destination already exists, we ask the user to confirm before
+    # overwriting.
     if os.path.exists(dest):
-        if user_confirm('An item named {} already exists. Overwrite? [yN] '):
-            copy_item(path, dest)
-            if dest == item:
-                print('Pasted {}.'.format(item))
-            else:
-                print('Pasted {} as {}.'.format(item, dest))
+        prompt = 'An item named {} already exists. Overwrite? [yN] '.format(dest)
+        overwrite = user_confirm(prompt)
+        if not overwrite:
+            print('Aborted')
+            return
+
+    copy_item(path, dest)
+    if dest == item:
+        print('Pasted {}.'.format(yellow(item)))
+    else:
+        print('Pasted {} as {}.'.format(yellow(item), yellow(dest)))
 
 
 def main():
     args = sys.argv[1:]
-    print(args)
-    if args[0] == 'cp':
+
+    # Default to the pst command when nothing else fits.
+    if len(args) == 0:
+        pst()
+    elif args[0] == 'cp':
         cp(args[1])
     elif args[0] == 'mv':
         mv(args[1])
     elif args[0] == 'pst':
         pst(args[1] if len(args) > 1 else None)
+    elif args[0] in ['-l', '--list']:
+        list_items()
+    elif args[0] in ['-c', '--clean']:
+        clean()
+    elif args[0] in ['-h', '--help']:
+        print(HELP_TEXT)
     else:
-        print('Unrecognized command {}.'.format(args[0]))
-    # elif args[0] in ['-l', '--list']:
-    #     pass
-    # elif args[0] in ['-c', '--clean']:
-    #     pass
+        pst(args[0])
 
 
 if __name__ == '__main__':
