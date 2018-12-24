@@ -22,7 +22,7 @@ cp() {
   if [ -n $1 ] && [ -z $2 ]; then
     first_char=$(echo "$1" | cut -c1)
     if [ "$first_char" != "-" ]; then
-      PST_PY cp "$1"
+      $PST_PY cp "$1"
       return
     fi
   fi
@@ -39,7 +39,7 @@ mv() {
   if [ -n $1 ] && [ -z $2 ]; then
     first_char=$(echo "$1" | cut -c1)
     if [ "$first_char" != "-" ]; then
-      PST_PY mv "$1"
+      $PST_PY mv "$1"
       return
     fi
   fi
@@ -55,7 +55,7 @@ pst() {
 
   # With no argument, paste whatever is stored in the "clipboard" to the cwd.
   if [ -z $1 ]; then
-    PST_PY pst
+    $PST_PY pst
   else
     case "$1" in
       "-l"|"--list") command ls -A $PST_CURR_DIR ;;
@@ -72,7 +72,7 @@ pst() {
         rm -rf $PST_CURR_DIR/*(N)
         rm -rf $PST_OLD_DIR/*(N)
       ;;
-      *) PST_PY pst "$1" ;;
+      *) $PST_PY pst "$1" ;;
     esac
   fi
 }
