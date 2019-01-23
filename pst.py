@@ -46,7 +46,7 @@ def copy_item(src, dest):
 def remove_item(item):
     ''' Remove file or directory `item`. '''
     if os.path.isdir(item):
-        os.rmdir(item)
+        shutil.rmtree(item)
     else:
         os.remove(item)
 
@@ -162,10 +162,18 @@ def main():
     # Default to the pst command when nothing else fits.
     if len(args) == 0:
         pst()
-    elif args[0] == 'cp':
-        cp(args[1])
-    elif args[0] == 'mv':
-        mv(args[1])
+    elif args[0] in ['cp', 'mv']:
+        item = args[1]
+
+        # Check that item to move or copy actually exists.
+        if not os.path.exists(item):
+            print('{} does not exist.'.format(yellow(item)))
+            return 1
+
+        if args[0] == 'cp':
+            cp(item)
+        else:
+            mv(item)
     elif args[0] == 'pst':
         pst(args[1] if len(args) > 1 else None)
     elif args[0] in ['-l', '--list']:
