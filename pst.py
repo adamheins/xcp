@@ -136,6 +136,10 @@ def pst(dest=None):
         print('Nothing to paste.')
         return
 
+    # TODO should handle pasting into a directory without overwriting the
+    # directory. Frankly, we can't overwrite a directory so we should warn
+    # about this too.
+
     path = paths[0]
     item = os.path.basename(path)
     dest = dest if dest else item
@@ -143,7 +147,7 @@ def pst(dest=None):
     # If the destination already exists, we ask the user to confirm before
     # overwriting.
     if os.path.exists(dest):
-        prompt = 'An item named {} already exists. Overwrite? [yN] '.format(dest)
+        prompt = 'An item named {} already exists. Overwrite? [yN] '.format(yellow(dest))
         overwrite = user_confirm(prompt)
         if not overwrite:
             print('Aborted')
