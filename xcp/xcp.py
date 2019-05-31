@@ -170,7 +170,7 @@ class XCPClipboard(object):
 
     def peek(self):
         ''' Get current file in the clipboard. '''
-        print(os.listdir(self.config.curr_dir)[0])
+        return os.listdir(self.config.curr_dir)[0]
 
     def clean(self):
         ''' Remove all items, both current and backed up. '''
@@ -189,39 +189,43 @@ class XCPClipboard(object):
         shutil.move(src, dest)
 
     def paste(self, dest=None):
+        ''' Paste item from the clipboard into the cwd, or optionally to
+            `dest`. '''
         if not os.path.isdir(self.config.curr_dir):
-            print('Nothing to paste.')
-            return
+            raise FileNotFoundError('Clipboard is empty.')
 
-        # TODO under what cicumstances are there multiple items in the curr
-        # dir?
         paths = list_dir_by_age(self.config.curr_dir)
         if len(paths) == 0:
-            print('Nothing to paste.')
-            return
-
-        # TODO should handle pasting into a directory without overwriting the
-        # directory. Frankly, we *can't* overwrite a directory so we should warn
-        # about this too.
+            raise FileNotFoundError('Clipboard is empty.')
 
         path = paths[0]
         item = os.path.basename(path)
         dest = dest if dest else item
 
-        # If the destination already exists, ask the user to confirm before
-        # overwriting.
-        if os.path.exists(dest):
-            prompt = 'An item named {} already exists. Overwrite? [yN] '.format(yellow(dest))
-            overwrite = user_confirm(prompt)
-            if not overwrite:
-                print('Aborted')
-                return
+        def check_exists(dest, count=0):
+            ''' Handle when destination already exists. '''
+            if count > 10:
+                raise RuntimeError('Recursion too deep.')
+
+            # If destination is a directory, nest.
+            if os.path.isdir(dest):
+                dest = os.path.join(dest, item)
+                return check_exists(dest, count + 1)
+
+            # If it's not a directory but still exists, ask before overwriting.
+            if os.path.exists(dest):
+                prompt = 'An item named {} already exists. Overwrite? [yN] '.format(yellow(dest))
+                if not user_confirm(prompt):
+                    raise Exception('Aborted by user.')
+            return dest
+
+        dest = check_exists(dest)
 
         copy_item(path, dest)
         if dest == item:
-            print('Pasted {}.'.format(yellow(item)))
+            return 'Pasted {}.'.format(yellow(item))
         else:
-            print('Pasted {} as {}.'.format(yellow(item), yellow(dest)))
+            return 'Pasted {} as {}.'.format(yellow(item), yellow(dest))
 
 
 def main():
@@ -249,9 +253,9 @@ def main():
             return 1
         clipboard.cut(item)
     elif cmd in ['v', 'p', 'paste']:
-        clipboard.paste(item)
+        print(clipboard.paste(item))
     elif cmd == 'peek':
-        clipboard.peek()
+        print(clipboard.peek())
     elif cmd == 'clean':
         clipboard.clean()
     else:
