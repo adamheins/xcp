@@ -116,9 +116,11 @@ class XCPConfig(object):
         }
 
     def load(self):
-        if os.env(CONFIG_FILE_ENV_VAR):
-            path = os.env(CONFIG_FILE_ENV_VAR)
-            self.update(yaml.load(path))
+        ''' Load configuration from file. '''
+        if CONFIG_FILE_ENV_VAR in os.environ:
+            path = os.environ[CONFIG_FILE_ENV_VAR]
+            with open(path) as f:
+                self.update(yaml.load(f))
         else:
             if os.path.exists(CONFIG_FILE_PATH):
                 self.update(yaml.load(CONFIG_FILE_PATH))
