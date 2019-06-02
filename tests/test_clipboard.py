@@ -1,76 +1,21 @@
 import io
 import os
-import sys
 import shutil
 import tempfile
 import time
+
 import pytest
-import yaml
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from xcp import xcp
-
-
-class TestConfig:
-
-    def setup_method(self):
-        self.config = xcp.XCPConfig()
-
-    def test_default(self):
-        assert self.config.as_dict() == {
-            'quiet': True,
-            'max_entries': 5,
-            'root_dir': os.path.expanduser('~/.xcp'),
-        }
-
-    def test_update(self):
-        d = {
-            'quiet': False,
-            'max_entries': 1,
-            'root_dir': '/foo/bar',
-        }
-        self.config.update(d)
-        assert self.config.as_dict() == d
-
-    def test_update_quiet_not_bool(self):
-        with pytest.raises(TypeError):
-            self.config.update({'quiet': 1})
-
-    def test_update_max_entries_not_int(self):
-        with pytest.raises(TypeError):
-            self.config.update({'max_entries': 5.0})
-
-    def test_update_max_entries_negative(self):
-        with pytest.raises(ValueError):
-            self.config.update({'max_entries': -1})
-
-    def test_load(self):
-        d = {
-            'quiet': False,
-            'max_entries': 1,
-            'root_dir': '/foo/bar',
-        }
-
-        fd, path = tempfile.mkstemp()
-
-        os.environ[xcp.CONFIG_FILE_ENV_VAR] = path
-
-        with os.fdopen(fd, 'w') as f:
-            yaml.dump(d, f)
-        self.config.load()
-
-        assert self.config.as_dict() == d
-
-        os.remove(path)
+import xcp
+from xcp import XCPConfig, XCPClipboard, XCPException
 
 
 class TestClipboard:
     def setup_method(self):
         # mock an xcp directory
-        self.config = xcp.XCPConfig()
+        self.config = XCPConfig()
         self.config.update({'root_dir': tempfile.mkdtemp()})
-        self.clipboard = xcp.XCPClipboard(self.config)
+        self.clipboard = XCPClipboard(self.config)
 
         # mock a working directory
         self.cwd = tempfile.mkdtemp()
@@ -113,7 +58,7 @@ class TestClipboard:
         assert self.read_cb_current_file(name) == text
 
     def test_copy_no_exist(self):
-        with pytest.raises(FileNotFoundError):
+        with pytest.raises(XCPException):
             self.clipboard.copy('foo.txt')
 
     def test_backup(self):
@@ -127,7 +72,7 @@ class TestClipboard:
         # foo9   is in the current clipboard
         # foo4-8 are in backup
         # foo0-3 are gone
-        paths = xcp.list_dir_by_age(self.config.back_dir)
+        paths = xcp.util.list_dir_by_age(self.config.back_dir)
         names = [os.path.basename(path) for path in paths]
         assert names == ['foo8.txt', 'foo7.txt', 'foo6.txt', 'foo5.txt',
                          'foo4.txt']
@@ -169,7 +114,7 @@ class TestClipboard:
         assert self.read_cwd_file('bar.txt') == text
 
     def test_paste_empty_cb(self):
-        with pytest.raises(FileNotFoundError):
+        with pytest.raises(XCPException):
             self.clipboard.paste()
 
     def test_paste_file_exists_y(self, monkeypatch):
