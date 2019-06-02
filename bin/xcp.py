@@ -1,0 +1,64 @@
+#!/usr/bin/env python3
+
+import sys
+
+from xcp import util, XCPConfig, XCPClipboard, XCPException
+
+
+HELP_TEXT = '''
+usage: xcp <command> <args>
+
+commands:
+  x|cut   <file>  Move the file into the clipboard. The file is removed from
+                  its current location.
+  c|copy  <file>  Copy the file into the clipboard. The file also remains in
+                  its current location.
+  p|paste [name]  Copy the file currently in the clipboard to the current
+                  working directory. Optionally rename the file.
+  peek            Print the name of the file in the clipboard.
+  clean           Clear the clipboard.
+'''.strip()
+
+
+def main(args):
+    if len(args) == 0 or args[0] in ['-h', '--help', 'help']:
+        print(HELP_TEXT)
+        return 0
+
+    cmd = args[0]
+    item = args[1] if len(args) > 0 else None
+
+    try:
+        config = XCPConfig()
+        config.load()
+        clipboard = XCPClipboard(config)
+
+        if cmd in ['c', 'copy']:
+            if not item:
+                print('File name required.')
+                return 1
+            clipboard.copy(item)
+        elif cmd in ['x', 'cut']:
+            if not item:
+                print('File name required.')
+                return 1
+            clipboard.cut(item)
+        elif cmd in ['p', 'paste']:
+            print(clipboard.paste(item))
+        elif cmd == 'peek':
+            print(clipboard.peek())
+        elif cmd == 'clean':
+            clipboard.clean()
+        else:
+            print('Unrecognized command. Try --help.')
+            return 1
+
+    except XCPException as e:
+        print(util.error_msg(str(e)))
+        return 1
+
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv[1:]))

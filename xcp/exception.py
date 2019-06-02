@@ -1,0 +1,2 @@
+class XCPException(Exception):
+    pass
