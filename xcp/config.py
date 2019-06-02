@@ -60,5 +60,6 @@ class XCPConfig(object):
             if os.path.exists(CONFIG_FILE_PATH):
                 self.update(yaml.load(CONFIG_FILE_PATH))
             else:
-                with open(CONFIG_FILE_PATH) as f:
+                os.makedirs(os.path.dirname(CONFIG_FILE_PATH), exist_ok=True)
+                with open(CONFIG_FILE_PATH, 'w') as f:
                     yaml.dump(self.as_dict(), f)
