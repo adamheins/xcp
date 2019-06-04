@@ -9,4 +9,5 @@ setup(name='xcp-tool',
       license='MIT',
       packages=['xcp'],
       scripts=['bin/xcp'],
+      python_requires='>=3',
       zip_safe=False)

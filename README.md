@@ -2,7 +2,8 @@
 A command line tool to cut, copy, and paste files.
 
 ## Installation
-To get the `xcp` command, install using pip:
+To get the `xcp` command, install using pip. Note that only Python 3 is
+supported.
 ```
 pip install xcp-tool
 ```
