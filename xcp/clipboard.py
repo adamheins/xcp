@@ -90,8 +90,7 @@ class XCPClipboard(object):
 
             # If it's not a directory but still exists, ask before overwriting.
             if os.path.exists(dest):
-                prompt = 'An item named {} already exists. \
-                          Overwrite? [yN] '.format(util.yellow(dest))
+                prompt = 'An item named {} already exists. Overwrite? [yN] '.format(util.yellow(dest))
                 if not util.user_confirm(prompt):
                     raise Exception('Aborted by user.')
             return dest
