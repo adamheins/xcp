@@ -17,6 +17,7 @@ commands:
                   working directory. Optionally rename the file.
   peek            Print the name of the file in the clipboard.
   clean           Clear the clipboard.
+  help            Print this message.
 '''.strip()
 
 
