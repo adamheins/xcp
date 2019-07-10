@@ -14,23 +14,23 @@ class TestConfig:
 
     def test_default(self):
         assert self.config.as_dict() == {
-            'quiet': True,
+            'verbose': True,
             'max_entries': 5,
             'root_dir': os.path.expanduser('~/.xcp'),
         }
 
     def test_update(self):
         d = {
-            'quiet': False,
+            'verbose': False,
             'max_entries': 1,
             'root_dir': '/foo/bar',
         }
         self.config.update(d)
         assert self.config.as_dict() == d
 
-    def test_update_quiet_not_bool(self):
+    def test_update_verbose_not_bool(self):
         with pytest.raises(XCPException):
-            self.config.update({'quiet': 1})
+            self.config.update({'verbose': 1})
 
     def test_update_max_entries_not_int(self):
         with pytest.raises(XCPException):
@@ -42,7 +42,7 @@ class TestConfig:
 
     def test_load(self):
         d = {
-            'quiet': False,
+            'verbose': False,
             'max_entries': 1,
             'root_dir': '/foo/bar',
         }

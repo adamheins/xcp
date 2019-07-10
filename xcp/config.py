@@ -11,7 +11,7 @@ CONFIG_FILE_ENV_VAR = 'XCP_CONFIG_PATH'
 
 class XCPConfig(object):
     def __init__(self):
-        self.quiet = True
+        self.verbose = True
         self.max_entries = 5
         self._set_root_dir(os.path.expanduser('~/.xcp'))
 
@@ -24,12 +24,12 @@ class XCPConfig(object):
 
     def update(self, d):
         '''  Update entries from a dict. '''
-        if 'quiet' in d:
-            v = d['quiet']
+        if 'verbose' in d:
+            v = d['verbose']
             if type(v) is not bool:
-                raise XCPException('quiet parameter must be of type bool')
+                raise XCPException('verbose parameter must be of type bool')
             else:
-                self.quiet = v
+                self.verbose = v
 
         if 'max_entries' in d:
             v = d['max_entries']
@@ -45,7 +45,7 @@ class XCPConfig(object):
     def as_dict(self):
         ''' Dump entries as a dict. '''
         return {
-            'quiet': self.quiet,
+            'verbose': self.verbose,
             'max_entries': self.max_entries,
             'root_dir': self.root_dir,
         }

@@ -8,7 +8,6 @@ pip install xcp-tool
 ```
 
 ## Usage
-### Basic
 ```
 usage: xcp <command> <args>
 
@@ -27,10 +26,9 @@ commands:
 ### Configuration
 xcp allows the user to configure certain properties:
 ```
-quiet: bool           Set to false for verbose output.
-max_entries: int > 0  Number of entries to backup after overwriting in the
-                      clipboard.
-root_dir: string      Directory to use for clipboard.
+root_dir:    string   Directory to use for clipboard.
+max_entries: int > 0  Number of most recent entries to keep backed up.
+verbose:     bool     Set to true for verbose output.
 ```
 
 These can be set in a yaml file at either `~/.config/xcp/config.yaml` or a file
