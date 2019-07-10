@@ -2,8 +2,7 @@
 A command line tool to cut, copy, and paste files.
 
 ## Installation
-To get the `xcp` command, install using pip. Note that only Python 3 is
-supported.
+To get the `xcp` command, install using pip. __Only Python 3 is supported.__
 ```
 pip install xcp-tool
 ```
@@ -44,6 +43,10 @@ respectively, when only a single file is passed to them. I also create a
 function `pst` to paste. A script `xcp.sh` located in the `sh` directory
 provides this functionality when sourced. It should work with both bash and
 zsh.
+
+## Development
+Testing is done using [pytest](https://docs.pytest.org/en/latest/). Simply run
+`pytest .` in the `tests/` directory.
 
 ## License
 MIT
