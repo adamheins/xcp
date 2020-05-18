@@ -1,6 +1,6 @@
 from setuptools import setup
 
-install_requires = ['colorama', 'yaml']
+install_requires = ['colorama', 'pyyaml']
 test_requires = ['pytest']
 
 setup(name='xcp-tool',
