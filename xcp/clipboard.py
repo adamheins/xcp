@@ -21,8 +21,9 @@ class XCPClipboard(object):
         # Move all files from current directory to the backup.
         for item in os.listdir(self.config.curr_dir):
             new_name = util.uniq_name(item, self.config.back_dir)
-            shutil.move(os.path.join(self.config.curr_dir, item),
-                        os.path.join(self.config.back_dir, new_name))
+            src = os.path.join(self.config.curr_dir, item)
+            dst = os.path.join(self.config.back_dir, new_name)
+            shutil.move(src, dst)
 
         # Remove all but the N most recent files in the backup directory.
         old_paths = util.list_dir_by_age(self.config.back_dir)

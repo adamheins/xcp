@@ -36,7 +36,7 @@ def list_dir_by_age(d):
     ''' Returns absolute paths of items in directory d, sorted by modification
         time, newest first. Emulates `ls -t`. '''
     items = [os.path.join(d, item) for item in os.listdir(d)]
-    return sorted(items, key=os.path.getmtime, reverse=True)
+    return sorted(items, key=os.path.getctime, reverse=True)
 
 
 def uniq_name(name, d):
