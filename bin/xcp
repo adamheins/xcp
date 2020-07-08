@@ -54,7 +54,7 @@ def main(args):
             print('Unrecognized command. Try --help.')
             return 1
 
-    except XCPException as e:
+    except (XCPException, PermissionError) as e:
         print(util.error_msg(str(e)))
         return 1
 
