@@ -55,10 +55,10 @@ class XCPConfig(object):
         if CONFIG_FILE_ENV_VAR in os.environ:
             path = os.environ[CONFIG_FILE_ENV_VAR]
             with open(path) as f:
-                self.update(yaml.load(f))
+                self.update(yaml.load(f, Loader=yaml.Loader))
         else:
             if os.path.exists(CONFIG_FILE_PATH):
-                self.update(yaml.load(CONFIG_FILE_PATH))
+                self.update(yaml.load(CONFIG_FILE_PATH, Loader=yaml.Loader))
             else:
                 os.makedirs(os.path.dirname(CONFIG_FILE_PATH), exist_ok=True)
                 with open(CONFIG_FILE_PATH, 'w') as f:
