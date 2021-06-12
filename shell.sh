@@ -14,14 +14,12 @@ xmv() {
   realpath "$@" >> "$CLIPBOARD_FILE"
 }
 
+# paste files from clipboard
+# executes [mv|cp] $files $args
+# in other words, the files in the clipboard are passed as the first arguments
+# to cp or mv, followed by all arguments passed to pst unaltered
 pst() {
-  local cmd dest files
-
-  if [ -z "$1" ]; then
-    dest="."
-  else
-    dest="$1"
-  fi
+  local cmd files
 
   # build array of the files to by cut or copied
   tail -n +2 "$CLIPBOARD_FILE" | while read line; do
@@ -31,8 +29,8 @@ pst() {
   # try to cut or copy files
   cmd=$(head -n 1 "$CLIPBOARD_FILE")
   if [ "$cmd" = "copy" ]; then
-    cp -r $files "$dest" && echo "cp -r$files \"$dest\""
+    cp $files $@
   elif [ "$cmd" = "cut" ]; then
-    mv $files "$dest" && echo "mv$files \"$dest\""
+    mv $files $@
   fi
 }
