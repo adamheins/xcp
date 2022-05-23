@@ -14,7 +14,10 @@ xcp() {
   while read line; do
     files+=("$line")
   done < "$CLIPBOARD_FILE"
-  cp $files $@
+  # flags:
+  # -i  prompt before overwrite
+  # -v  say what is being done
+  cp -iv $files $@
 }
 
 
@@ -24,5 +27,5 @@ xmv() {
   while read line; do
     files+=("$line")
   done < "$CLIPBOARD_FILE"
-  mv $files $@
+  mv -iv $files $@
 }
